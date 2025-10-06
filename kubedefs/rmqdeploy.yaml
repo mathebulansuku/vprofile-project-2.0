@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vprormq
+  labels:
+    app: vprormq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vprormq
+  template:
+    metadata:
+      labels:
+        app: vprormq
+    spec:
+      containers:
+        - name: vprormq
+          image: rabbitmq
+          volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: vprofile-mysql-pvc
+          ports:
+            - name: vprormq-port
+              containerPort: 5672
+          env:
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: rmq-pass
+            - name: RABBITMQ_DEFAULT_USER
+              value: "guest"
+      volumes:
+        - name: vpro-db-data
+          persistentVolumeClaim:
+            claimName: dvprofile-mysql-pvc
+      initContainers:
+        - name: busybox
+          image: busybox:latest
+          args: ["rm", "-rf", "var/lib/mysql/lost+found"]
+          volumeMounts:
+            - name: vpro-db-data
+              mountPath: /var/lib/mysql
+            
