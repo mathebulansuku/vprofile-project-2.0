@@ -32,7 +32,7 @@ spec:
       volumes:
         - name: vpro-db-data
           persistentVolumeClaim:
-            claimName: dvprofile-mysql-pvc
+            claimName: vprofile-mysql-pvc
       initContainers:
         - name: busybox
           image: busybox:latest
